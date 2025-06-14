@@ -19,11 +19,13 @@ export const container = {
 
 export const title = {
   fontSize: "2rem",
+  textAlign: "center" as const,
 };
 
 export const pageSizeAlert = {
   color: COLOR.PRIMARY.STANDARD,
   wordBreak: "keep-all" as const,
+  textAlign: "center" as const,
 
   [mq[0]]: {
     display: "none",
