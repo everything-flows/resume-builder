@@ -13,21 +13,23 @@ export default function ActionPanel({
   fileUrl,
   fileName,
 }: {
-  onSave: () => void;
-  onDelete: () => void;
+  onSave?: () => void;
+  onDelete?: () => void;
   fileUrl: string | null;
   fileName: string;
 }) {
   return (
     <div css={container}>
-      <button
-        css={button}
-        onClick={() => {
-          onSave();
-        }}
-      >
-        <SaveIcon size="1.5rem" color={COLOR.WHITE.STANDARD} />
-      </button>
+      {onSave && (
+        <button
+          css={button}
+          onClick={() => {
+            onSave();
+          }}
+        >
+          <SaveIcon size="1.5rem" color={COLOR.WHITE.STANDARD} />
+        </button>
+      )}
 
       <button css={button}>
         <a href={fileUrl || ""} download={fileName}>
@@ -35,14 +37,16 @@ export default function ActionPanel({
         </a>
       </button>
 
-      <button
-        css={[button, importantButton]}
-        onClick={() => {
-          onDelete();
-        }}
-      >
-        <DeleteIcon size="1.5rem" color={COLOR.WHITE.STANDARD} />
-      </button>
+      {onDelete && (
+        <button
+          css={[button, importantButton]}
+          onClick={() => {
+            onDelete();
+          }}
+        >
+          <DeleteIcon size="1.5rem" color={COLOR.WHITE.STANDARD} />
+        </button>
+      )}
     </div>
   );
 }

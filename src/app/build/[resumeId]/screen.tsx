@@ -2,6 +2,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import useDebounce from "@/hooks/useDebounce";
 
 import { usePDF } from "@react-pdf/renderer";
@@ -16,30 +17,25 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 
 import { container, body, inputArea, previewArea } from "./styles";
 import Header from "@components/Header";
+import { createClient } from "@/utils/supabase/client";
+import { deleteResume } from "@/utils/supabase/deleteResume";
 import type { Resume } from "@/types/resume";
+import { RESUME_TABLE } from "@/utils/supabase/constant";
+import { updateResume } from "@/utils/supabase/updateResume";
 
-const emptyTemplate = {
-  userInfo: {
-    name: "",
-    position: "",
-    quote: "",
-    contact: [],
-    address: "",
-  },
-  sectionList: [],
-};
+export default function BuildScreen({
+  resumeId,
+  initialData,
+}: {
+  resumeId: string;
+  initialData: Resume;
+}) {
+  // console.error = () => {}; // todo : fix error
+  const router = useRouter();
 
-export default function BuildScreen() {
-  const [data, setData] = useState<Resume>({
-    id: 0,
-    createdAt: new Date(),
-    modifiedAt: new Date(),
-    fileName: "",
-    mainColor: "#ff0000",
-    ...emptyTemplate,
-  });
-  const [resumeFileName, setResumeFileName] = useState("새 이력서");
-  const [mainColor, setMainColor] = useState("#ff0000");
+  const [data, setData] = useState<Resume>(initialData);
+  const [resumeFileName, setResumeFileName] = useState(initialData.fileName);
+  const [mainColor, setMainColor] = useState(initialData.mainColor || "#000");
 
   const [pdfComponent, setPdfComponent] = useState(
     <PDFPage data={data} mainColor={mainColor} />
@@ -113,6 +109,35 @@ export default function BuildScreen() {
     1000
   );
 
+  async function onSave() {
+    try {
+      await updateResume(
+        createClient,
+        resumeId,
+        resumeFileName,
+        data,
+        mainColor
+      );
+      alert("저장되었습니다.");
+    } catch (error) {
+      alert("저장에 실패했습니다. 잠시 뒤에 다시 시도해주세요.");
+    }
+  }
+
+  async function onDelete() {
+    if (!confirm("삭제한 파일은 되돌릴 수 없습니다. 삭제하시겠습니까?")) {
+      return;
+    }
+
+    try {
+      await deleteResume(createClient, RESUME_TABLE, resumeId);
+      alert("삭제되었습니다.");
+      router.push("/");
+    } catch (error) {
+      alert("삭제에 실패했습니다. 잠시 뒤에 다시 시도해주세요.");
+    }
+  }
+
   return (
     <div css={container}>
       <Header />
@@ -126,6 +151,8 @@ export default function BuildScreen() {
             setMainColor={setMainColor}
             resumeFileName={resumeFileName}
             setResumeFileName={setResumeFileName}
+            onSave={onSave}
+            onDelete={onDelete}
             fileUrl={instance.url}
             fileName={`${resumeFileName}.pdf`}
           />

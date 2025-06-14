@@ -36,7 +36,7 @@ export default function MainPage({ resumeList }: { resumeList: Resume[] }) {
         {resumeList?.map((resumeDatum: Resume, resumeDatumIdx: number) => (
           <Link
             key={resumeDatumIdx}
-            href={`/build?resumeId=${resumeDatum?.id}`}
+            href={`/build/${resumeDatum?.id}`}
             css={resetLinkStyle}
           >
             <Card data={resumeDatum} />
