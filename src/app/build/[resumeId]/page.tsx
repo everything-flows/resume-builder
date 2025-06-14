@@ -11,3 +11,5 @@ async function Build({ params }: { params: { resumeId: string } }) {
 }
 
 export default Build;
+
+export const runtime = "edge";
